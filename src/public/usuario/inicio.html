@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Mind - Panel de Usuario</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body class="dashboard">
+    <aside class="sidebar">
+        <div class="user-profile">
+            <div class="avatar">U</div>
+            <h3 id="username">Usuario</h3>
+            <p id="user-email">usuario@example.com</p>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="active"><a href="inicio.html">Inicio</a></li>
+                <li><a href="encuestas.html">Encuestas emocionales</a></li>
+                <li><a href="calendario.html">Mi calendario</a></li>
+                <li><a href="actividades.html">Actividades</a></li>
+                <li><a href="historial.html">Historial</a></li>
+                <li><a href="#" id="logout">Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Bienvenido de vuelta</h1>
+            <div class="header-actions">
+                <button class="btn-icon" id="notifications">
+                    <span class="icon">🔔</span>
+                </button>
+            </div>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="emotional-summary">
+                <h2>Tu estado emocional hoy</h2>
+                <div class="summary-card">
+                    <p>No has completado tu encuesta emocional hoy.</p>
+                    <a href="encuestas.html" class="btn-primary">Realizar encuesta</a>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <h2>Acciones rápidas</h2>
+                <div class="action-cards">
+                    <a href="calendario.html" class="action-card">
+                        <h3>Ver calendario</h3>
+                        <p>Revisa tus actividades programadas</p>
+                    </a>
+                    <a href="actividades.html" class="action-card">
+                        <h3>Actividades</h3>
+                        <p>Ejercicios para mejorar tu concentración</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar sesión
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            
+            if (!loggedInUser) {
+                window.location.href = '../../login.html';
+                return;
+            }
+            
+            // Mostrar información del usuario
+            const user = JSON.parse(loggedInUser);
+            document.getElementById('username').textContent = user.fullname;
+            document.getElementById('user-email').textContent = user.email;
+            
+            // Cerrar sesión
+            document.getElementById('logout').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('loggedInUser');
+                window.location.href = '../../index.html';
+            });
+            
+            // Simular datos de encuestas si no existen
+            if (!localStorage.getItem('emotionalSurveys')) {
+                const defaultSurveys = [
+                    {
+                        id: 1,
+                        question: "¿Cómo te sientes hoy?",
+                        type: "scale",
+                        min: 1,
+                        max: 5
+                    },
+                    {
+                        id: 2,
+                        question: "¿Cuánto estrés sentiste en las últimas 24 horas?",
+                        type: "scale",
+                        min: 1,
+                        max: 5
+                    },
+                    {
+                        id: 3,
+                        question: "¿Qué emociones has experimentado más hoy?",
+                        type: "multiple",
+                        options: ["Alegría", "Tristeza", "Enojo", "Miedo", "Sorpresa", "Calma"]
+                    }
+                ];
+                localStorage.setItem('emotionalSurveys', JSON.stringify(defaultSurveys));
+            }
+            
+            // Simular actividades si no existen
+            if (!localStorage.getItem('activities')) {
+                const defaultActivities = [
+                    {
+                        id: 1,
+                        title: "Dibujo libre",
+                        type: "drawing",
+                        description: "Expresa tus emociones a través del dibujo."
+                    },
+                    {
+                        id: 2,
+                        title: "Rompecabezas",
+                        type: "puzzle",
+                        description: "Ejercita tu mente armando piezas."
+                    },
+                    {
+                        id: 3,
+                        title: "Colorear mandalas",
+                        type: "coloring",
+                        description: "Relájate coloreando patrones."
+                    },
+                    {
+                        id: 4,
+                        title: "Escritura libre",
+                        type: "writing",
+                        description: "Desahoga tus pensamientos por escrito."
+                    },
+                    {
+                        id: 5,
+                        title: "Juego de memoria",
+                        type: "memory",
+                        description: "Entrena tu memoria visual."
+                    }
+                ];
+                localStorage.setItem('activities', JSON.stringify(defaultActivities));
+            }
+        });
+    </script>
+</body>
+</html>

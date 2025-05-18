@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendario | Focus Mind</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .calendar-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .day {
+            height: 100px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+        .day:hover {
+            background-color: #f8f9fa;
+        }
+        .day.today {
+            background-color: #e3f2fd;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container calendar-container">
+    <h1 class="text-center">Calendario de Bienestar</h1>
+    <p class="text-center">Planifica tus rutinas y actividades diarias para mejorar tu salud emocional</p>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <button id="prev" class="btn btn-outline-primary"><i class="fas fa-chevron-left"></i></button>
+        <h2 id="monthYear"></h2>
+        <button id="next" class="btn btn-outline-primary"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <div class="row text-center fw-bold">
+        <div class="col">Dom</div><div class="col">Lun</div><div class="col">Mar</div>
+        <div class="col">Mié</div><div class="col">Jue</div><div class="col">Vie</div><div class="col">Sáb</div>
+    </div>
+
+    <div id="calendar" class="row flex-wrap mt-2"></div>
+</div>
+
+<script>
+    const calendar = document.getElementById('calendar');
+    const monthYear = document.getElementById('monthYear');
+    let date = new Date();
+
+    function renderCalendar() {
+        calendar.innerHTML = '';
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+
+        monthYear.textContent = date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < firstDay; i++) {
+            calendar.innerHTML += '<div class="col day"></div>';
+        }
+
+        for (let day = 1; day <= lastDate; day++) {
+            const currentDate = new Date(year, month, day);
+            const isToday = today.toDateString() === currentDate.toDateString();
+            calendar.innerHTML += `
+                <div class="col day ${isToday ? 'today' : ''}" onclick="alert('Actividades del día ${day}/${month + 1}')">
+                    ${day}
+                </div>`;
+        }
+    }
+
+    document.getElementById('prev').addEventListener('click', () => {
+        date.setMonth(date.getMonth() - 1);
+        renderCalendar();
+    });
+
+    document.getElementById('next').addEventListener('click', () => {
+        date.setMonth(date.getMonth() + 1);
+        renderCalendar();
+    });
+
+    renderCalendar();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Admin - Gestión de Usuarios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #007BFF;
+      color: white;
+      text-transform: uppercase;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    button {
+      padding: 6px 12px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+    }
+    .edit-btn {
+      background-color: #28a745;
+    }
+    .delete-btn {
+      background-color: #dc3545;
+    }
+    .edit-btn:hover {
+      background-color: #218838;
+    }
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: #007BFF;
+    }
+    .modal-content label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #555;
+    }
+    .modal-content input[type="text"],
+    .modal-content input[type="email"],
+    .modal-content input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .modal-content input[type="checkbox"] {
+      margin-top: 10px;
+    }
+    .modal-footer {
+      margin-top: 20px;
+      text-align: right;
+    }
+    .modal-footer button {
+      margin-left: 10px;
+      padding: 8px 15px;
+      font-size: 14px;
+    }
+    .close-btn {
+      background-color: #6c757d;
+    }
+    .save-btn {
+      background-color: #007BFF;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Panel de Administración - Gestión de Usuarios</h1>
+
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Contraseña</th>
+        <th>Admin</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Los usuarios se cargarán aquí dinámicamente -->
+    </tbody>
+  </table>
+
+  <!-- Modal para editar usuario -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h2>Editar Usuario</h2>
+      <form id="editForm">
+        <input type="hidden" id="editUserId" />
+        <label for="editNombre">Nombre</label>
+        <input type="text" id="editNombre" name="nombre" required />
+
+        <label for="editCorreo">Correo</label>
+        <input type="email" id="editCorreo" name="correo" required />
+
+        <label for="editContraseña">Contraseña</label>
+        <input type="password" id="editContraseña" name="contraseña" placeholder="Dejar vacío para no cambiar" />
+
+        <label>
+          <input type="checkbox" id="editEsAdmin" name="es_admin" />
+          Es Admin
+        </label>
+
+        <div class="modal-footer">
+          <button type="button" class="close-btn" onclick="closeModal()">Cancelar</button>
+          <button type="submit" class="save-btn">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Función para cerrar modal
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Abrir modal con datos del usuario para editar
+    function openEditModal(user) {
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('editNombre').value = user.nombre;
+      document.getElementById('editCorreo').value = user.correo;
+      document.getElementById('editContraseña').value = '';
+      document.getElementById('editEsAdmin').checked = user.es_admin;
+      document.getElementById('editModal').style.display = 'block';
+    }
+
+    // Cargar usuarios desde el backend
+    async function loadUsers() {
+      try {
+        const res = await fetch('/users'); // Ruta para obtener usuarios (ajustar backend)
+        const users = await res.json();
+
+        const tbody = document.querySelector('#usersTable tbody');
+        tbody.innerHTML = '';
+
+        users.forEach(user => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${user.nombre}</td>
+            <td>${user.correo}</td>
+            <td>********</td>
+            <td>${user.es_admin ? 'Sí' : 'No'}</td>
+            <td>
+              <button class="edit-btn" onclick='openEditModal(${JSON.stringify(user)})'>Editar</button>
+              <button class="delete-btn" onclick="deleteUser(${user.id})">Eliminar</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+      }
+    }
+
+    // Eliminar usuario
+    async function deleteUser(id) {
+      if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
+      try {
+        const res = await fetch(`/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          alert('Usuario eliminado');
+          loadUsers();
+        } else {
+          alert('Error al eliminar usuario');
+        }
+      } catch (error) {
+        alert('Error de red al eliminar usuario');
+      }
+    }
+
+    // Enviar formulario de edición
+    document.getElementById('editForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const id = document.getElementById('editUserId').value;
+      const nombre = document.getElementById('editNombre').value.trim();
+      const correo = document.getElementById('editCorreo').value.trim();
+      const contraseña = document.getElementById('editContraseña').value;
+      const es_admin = document.getElementById('editEsAdmin').checked;
+
+      if (!nombre || !correo) {
+        alert('Nombre y correo son obligatorios');
+        return;
+      }
+
+      const data = { nombre, correo, es_admin };
+
+      // Solo enviar contraseña si se modificó
+      if (contraseña) data.contraseña = contraseña;
+
+      try {
+        const res = await fetch(`/users/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          alert('Usuario actualizado');
+          closeModal();
+          loadUsers();
+        } else {
+          alert('Error al actualizar usuario');
+        }
+      } catch (error) {
+        alert('Error de red al actualizar usuario');
+      }
+    });
+
+    // Cargar usuarios al cargar la página
+    window.onload = loadUsers;
+
+    // Cerrar modal si se hace click fuera del contenido
+    window.onclick = function(event) {
+      const modal = document.getElementById('editModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+  </script>
+</body>
+</html>

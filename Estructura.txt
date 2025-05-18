@@ -1,0 +1,53 @@
+/Focuspagi
+├── admin/                 ← Vistas del administrador
+│   ├── inicio.html        X ← Vista principal (CRUD usuarios)
+│   ├── usuarios.html
+│   ├── encuestas.html
+│   ├── calendario.html
+│   └── estadisticas.html
+│
+├── usuario/               ← Vistas del usuario
+│   ├── inicio.html
+│   ├── actividades.html
+│   ├── calendario.html
+│   ├── encuestas.html
+│   └── historial.html
+│
+├── public/                ← Archivos estáticos
+│   ├── css/
+│   └── img/
+│
+├── js/                    ← Lógica de frontend
+│   ├── auth.js            X ← Funcionalidad login/register
+│   ├── iniciousuarios.js  X ← Scripts de inicio usuario
+│   ├── admin.js
+│   └── main.js
+│
+├── src/
+│   └── database/
+│       └── connection.js  X ← Conexión a MySQL
+│
+├── routes/
+│   └── authRoutes.js      X ← Rutas de autenticación y navegación
+│
+├── index.js               ← Servidor Express
+├── login.html
+├── register.html
+├── package.json
+
+base de datos
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS Focus_mind;
+
+-- Usar la base de datos
+USE Focus_mind;
+
+-- Crear la tabla users
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(25) NOT NULL,
+    correo VARCHAR(25) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL,  -- se recomienda usar hash, por eso se deja espacio extra
+    es_admin BOOLEAN NOT NULL DEFAULT FALSE
+);
+
